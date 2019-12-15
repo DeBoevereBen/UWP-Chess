@@ -1,0 +1,99 @@
+﻿<Page
+    x:Class="Realdolmen.UWP.Chess.Views.BoardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converters="using:Realdolmen.UWP.Chess.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Realdolmen.UWP.Chess.Views"
+    xmlns:m="using:Realdolmen.UWP.Chess.Models"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:vm="using:Realdolmen.UWP.Chess.ViewModels"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="DefaultBorder" TargetType="Button">
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style x:Key="SelectedBorder" TargetType="Button">
+            <Setter Property="BorderBrush" Value="LightBlue" />
+        </Style>
+        <Style x:Key="AvailableBorder" TargetType="Button">
+            <Setter Property="BorderBrush" Value="LightPink" />
+        </Style>
+        <converters:BoolToBorderConverter x:Key="boolToBorder" />
+        <converters:BoolToBackGroundConverter x:Key="boolToBackground" />
+        <converters:BoolToForeGroundConverter x:Key="boolToForeground" />
+        <converters:InverseBoolToVisibility x:Key="inverseBoolToVis" />
+        <converters:BoolToVisibility x:Key="boolToVis" />
+        <converters:BoolToInverseConverter x:Key="boolInverse" />
+        <DataTemplate x:Key="TilesTemplate" x:DataType="vm:TileViewModel">
+            <Button
+                Width="75"
+                Height="75"
+                Background="{x:Bind IsBlack, Mode=OneWay, Converter={StaticResource boolToBackground}}"
+                BorderBrush="{x:Bind Bools, Mode=OneWay, Converter={StaticResource boolToBorder}}"
+                BorderThickness="3"
+                Command="{Binding Path=DataContext.ViewModel.HandleClickCommand, ElementName=gvTiles}"
+                CommandParameter="{x:Bind}"
+                Foreground="{x:Bind IsBlack, Mode=OneWay, Converter={StaticResource boolToForeground}}">
+                <Button.Resources>
+                    <ResourceDictionary>
+                        <ResourceDictionary.ThemeDictionaries>
+                            <ResourceDictionary x:Key="Dark">
+                                <SolidColorBrush x:Key="ButtonBackground" Color="Transparent" />
+                                <SolidColorBrush x:Key="ButtonForeground" Color="Transparent" />
+                                <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
+                            </ResourceDictionary>
+                            <ResourceDictionary x:Key="Light">
+                                <SolidColorBrush x:Key="ButtonBackground" Color="Transparent" />
+                                <SolidColorBrush x:Key="ButtonForeground" Color="Transparent" />
+                                <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
+                            </ResourceDictionary>
+                        </ResourceDictionary.ThemeDictionaries>
+                    </ResourceDictionary>
+                </Button.Resources>
+                <Image Source="{x:Bind ImageSrc, Mode=OneWay}" Stretch="UniformToFill" />
+            </Button>
+        </DataTemplate>
+    </Page.Resources>
+
+
+    <controls:DockPanel>
+        <TextBlock
+            Margin="10"
+            HorizontalAlignment="Center"
+            controls:DockPanel.Dock="Top"
+            FontSize="25"
+            Text="{x:Bind ViewModel.PlayerTurn, Mode=OneWay}"
+            Visibility="{x:Bind ViewModel.Model.GameOver.Finished, Mode=OneWay, Converter={StaticResource boolToVis}}" />
+        <TextBlock
+            Margin="10"
+            HorizontalAlignment="Center"
+            controls:DockPanel.Dock="Top"
+            FontSize="25"
+            Text="{x:Bind ViewModel.GameOver, Mode=OneWay}"
+            Visibility="{x:Bind ViewModel.Model.GameOver.Finished, Mode=OneWay, Converter={StaticResource inverseBoolToVis}}" />
+        <GridView
+            x:Name="gvTiles"
+            HorizontalAlignment="Center"
+            controls:DockPanel.Dock="Top"
+            IsEnabled="{x:Bind ViewModel.Model.GameOver.Finished, Mode=OneWay, Converter={StaticResource boolInverse}}"
+            IsItemClickEnabled="True"
+            ItemTemplate="{StaticResource TilesTemplate}"
+            ItemsSource="{x:Bind ViewModel.Tiles, Mode=TwoWay}"
+            SelectionMode="Single">
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid
+                        x:Name="MaxItemsWrapGrid"
+                        MaximumRowsOrColumns="8"
+                        Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+        </GridView>
+    </controls:DockPanel>
+
+</Page>
